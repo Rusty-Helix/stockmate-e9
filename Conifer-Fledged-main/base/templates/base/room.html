@@ -1,0 +1,185 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<main class="profile-page layout layout--2">
+  <div class="container">
+    <!-- Room Start -->
+    <div class="room">
+      <div class="room__top">
+        <div class="room__topLeft">
+          <a href="{% url 'home' %}">
+            <i class="fa-solid fa-arrow-left"></i> 
+          </a>
+          <h3>Back to Homepage</h3>
+        </div>
+        {% if room.host == request.user %}
+        <div class="room__topRight">
+          
+          <a href="{% url 'update-room' room.id %}" style="color:white">
+            <i class="fa-solid fa-pen-to-square"></i>
+              Edit
+    
+          </a>
+
+          <a href="{% url 'delete-room' room.id %}" style="color:white">
+            <i class="fa-solid fa-trash-can"></i> Delete
+          </a>
+
+          </a>
+        </div>
+        {% else %}
+          <a href="{% url 'report-room' room.id%}" style="color:white">
+            <i class="fa-solid fa-triangle-exclamation"></i> Report Post
+          </a>
+        {% endif %}
+
+      </div>
+      <div class="room__box scroll">
+        <div class="room__header scroll">
+          <div class="room__info">
+            <h3>{{room.name}}</h3>
+            <span>{{room.created|timesince}} ago &nbsp;&nbsp;</span>
+          </div>
+          <div class="room__hosted">
+            <p>Created By</p>
+            <a href="{% url 'user-profile' room.host.id %}" class="room__author">
+              {% if room.host.avatar.url %}
+              <div class="avatar avatar--medium active">
+                  <img src="{{room.host.avatar.url}}" />
+              </div>
+              {% else %}
+              <div class="avatar avatar--medium active">
+                  <img src="{% static 'images/default-avatar.svg' %}" />
+              </div>
+              {% endif %}
+              <span>@{{room.host.username}}</span>
+            </a>
+          </div>
+            <div class="room__details">
+              {{room.description | linebreaks}}
+
+                <span>
+                <br>
+                <table>
+                  {% for simage in room.image_set.all %}
+                  <tr>
+                    {% if simage.image %}
+                      <img  style="  display: block;  margin-left: auto;  margin-right: auto;  width: 75%; border:5px black;" src="{{ simage.image.url }}">
+                    {% endif %}
+                  </tr> 
+                  {% endfor %}
+                </table>
+                </span>
+              <br>
+                {% load social_share %}
+                <table style="width: 100%;">
+                  <tr>
+                    <td style="padding: 5px; background-color:#000000; text-align: center;width:25%;"> {% post_to_facebook object_or_url "Share To Facebook" %}</td>
+                    <td style="padding: 5px; background-color:#000000; text-align: center;width:25%;"> {% post_to_telegram object_or_url "Share To Telegram" %}</td>
+                    <td style="padding: 5px; background-color:#000000; text-align: center;width:25%;"> {% post_to_whatsapp object_or_url "Share To WA" %}</td>
+                    <td style="padding: 5px; background-color:#000000; text-align: center;width:25%;"> {% post_to_reddit  object_or_url "Share To Reddit" %}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding-top: 10px;">
+                      <form action = "{% url 'room-like' room.id %}" method='POST'>
+                      {% csrf_token %}
+                      <input type ="hidden" name='room_id' value="{{room.id}}">
+                      {% if user not in room.likes.all %}
+                        <button class="btn btn--main"><i class="fa-regular fa-thumbs-up"></i>Like</button> &nbsp;{{room.like_count}} likes
+                      {% else %}
+                        <button class="btn btn--main"><i class="fa-solid fa-thumbs-up"></i>Unlike</button> &nbsp;{{room.like_count}} likes
+                      {% endif %}
+                     </form>
+                    
+                    </td>
+                    </tr>
+                  </table>
+                <span class="room__topics">{{room.topic}}</span>
+          </div>
+        </div>
+
+        <div class="room__conversation">
+          <div class="threads scroll">
+
+
+            {% for message in room_messages %}
+            <div class="thread">
+              <div class="thread__top">
+                <div class="thread__author">
+                  <a href="{% url 'user-profile' message.user.id %}" class="thread__authorInfo">
+
+                    {% if message.user.avatar.url %}
+                    <div class="avatar avatar--medium active">
+                        <img src="{{message.user.avatar.url}}" />
+                    </div>
+                    {% else %}
+                    <div class="avatar avatar--medium active">
+                        <img src="{% static 'images/default-avatar.svg' %}" />
+                    </div>
+                    {% endif %}
+
+                    <span>@{{message.user.username}}</span>
+                  </a>
+                  <span class="thread__date">{{message.created|timesince}} ago</span>
+                </div>
+
+                {% if request.user == message.user %}
+                <a href="{% url 'delete-message' message.id %}">
+                  <div class="thread__delete">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                      <title>remove</title>
+                      <path
+                        d="M27.314 6.019l-1.333-1.333-9.98 9.981-9.981-9.981-1.333 1.333 9.981 9.981-9.981 9.98 1.333 1.333 9.981-9.98 9.98 9.98 1.333-1.333-9.98-9.98 9.98-9.981z">
+                      </path>
+                    </svg>
+                  </div>
+                </a>
+                {% endif %}
+              </div>
+              <div class="thread__details">
+                {{message.body}}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+      <div class="room__message">
+        <form action="" method="POST">
+          {% csrf_token %}
+          <input name="body" placeholder="Leave your comment here..." />
+        </form>
+      </div>
+    </div>
+    <!-- Room End -->
+
+    <!--   Start -->
+    <div class="participants">
+      <h3 class="participants__top">Participants <span>({{participants.count}} Commented)</span></h3>
+      <div class="participants__list scroll">
+        {% for participant in participants %}
+        <a href="{%  url 'user-profile' participant.id %}" class="participant">
+            {% if participant.avatar.url %}
+            <div class="avatar avatar--medium active">
+                <img src="{{ participant.avatar.url}}" />
+            </div>
+            {% else %}
+            <div class="avatar avatar--medium active">
+                <img src="{% static 'images/default-avatar.svg' %}" />
+            </div>
+            {% endif %}
+          <p>
+            {{participant.name}}
+            <span>@{{participant.username}}</span>
+          </p>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    <!--  End -->
+  </div>
+</main>
+<script src="script.js"></script>
+{% endblock content %}

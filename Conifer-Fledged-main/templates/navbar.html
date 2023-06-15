@@ -1,0 +1,118 @@
+{% load static %}
+<header class="header header--loggedIn">
+        <div class="container">
+
+            
+            <a href="{% url 'home' %}" class="header__logo">
+                <img src="{% static 'images/ncu_forum_logo.png' %}" />
+                <h1 id='top-left-title'>Conifer</h1>
+            </a>
+        
+        <form class="header__search" method="GET" action="{% url 'home' %}">
+            <label>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input name="q" placeholder="Search for Posts..." />
+            </label>
+        </form>
+ 
+
+        {% if is_home %}
+        <div class="order-container">
+            <form class="" method="GET" action="{% url 'home' %}">
+                
+                <label for="order_option">
+                    Sort Posts by <br>
+                </label>
+                <div class="custom-select" style="width:300px;">
+                    <select class="order-selection" name="order_option" default='created'>
+                        <option class="opt" value="created">date created</option>
+                        <option class="opt" value="updated">date updated</option>
+                        <option class="opt" value="like_count">likes</option>
+                        <option class="opt" value="message_count">comments</option>
+                    </select>
+                    
+                    <select class="order-selection" name="order_direction" default="descending">
+                        <option class="opt" value="descending">descending</option>
+                        <option class="opt" value="ascending">ascending</option>
+                    </select>
+
+                    <input id="order-button" type="submit" value="Sort">
+                </div>
+                
+            </form>
+        </div>
+        {% elif request.user.is_authenticated %}
+        <div id="liked-post-button">
+            <a class='btn btn--main' href="{% url 'liked-rooms' %}">Liked&nbsp;Posts</a>
+        </div>
+        {% endif %}
+        
+
+        <nav class="header__menu">
+
+
+            <!-- Logged In -->
+            {% if request.user.is_authenticated %}
+            <div class="header__user">
+                <a href="{% url 'user-profile' request.user.id %}">
+
+                    {% if request.user.avatar.url %}
+                    <div class="avatar avatar--medium active">
+                        <img src="{{request.user.avatar.url}}" />
+                    </div>
+                    {% else %}
+                    <div class="avatar avatar--medium active">
+                        <img src="{% static 'images/default-avatar.svg' %}" />
+                    </div>
+                    {% endif %}
+
+                    <p>{{request.user.username}} <span>@{{request.user.username}}</span></p>
+                </a>
+   
+                <button class="dropdown-button">
+                    <i class="fa-solid fa-gear"> -->
+                        <title>chevron-down</title>
+                    </i>
+                </button>
+            </div>
+            {% else %}
+
+            <a href="{% url 'login' %}">
+                <img src="{% static 'images/default-avatar.svg' %}" />
+                <p>Login</p>
+            </a>
+            {% endif %}
+
+            <div class="dropdown-menu">
+
+                <a href="{% url 'update-user' %}" class="dropdown-link">
+                    <i class="fa-solid fa-file-pen"></i>Profile
+                </a>
+
+
+                    {% if request.user.is_superuser %}
+                    <a href="{% url 'report-management' %}" class="dropdown-link">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                        Reports</a>
+                    {% endif %}
+
+                    <a href="{% url 'logout' %}" class="dropdown-link">
+                        <i class="fa-solid fa-up-right-from-square"></i>
+                    Logout</a>
+
+                        
+                </div>
+
+        </nav>
+    </div>
+</header>
+
+
+
+<!-- {% if request.user.is_authenticated %}
+<p>Hello {{request.user}}</p>
+<a href="{% url 'logout' %}">Logout</a>
+{% else %}
+<a href="{% url 'login' %}">Login</a>
+{% endif %} -->
+

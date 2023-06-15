@@ -1,0 +1,36 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="delete-item layout">
+    <div class="container">
+        <div class="layout__box">
+            <div class="layout__boxHeader">
+                <div class="layout__boxTitle">
+                    <a href="{{request.META.HTTP_REFERER}}">
+                    <i class="fa-solid fa-arrow-left"></i> 
+                    </a>
+                    <h3>Pass or Deny the Report Request</h3>
+                </div>
+            </div>
+            <div class="layout__body">
+                <form class="form" method="POST" action="">
+                    {% csrf_token %}
+                    <div class="form__group">
+                        <h3>Post Name: "{{report_request.room.name}}"</h3>
+                        <h3>Report Reason: "{{report_request.reason}}"</h3>
+                    </div>
+
+                    <div class="for__group">
+                        <input name="censor_result" class="btn btn--main" type="submit" value="Pass Report Request (Delete Post)" />
+                    </div>
+                    <br>
+                    <div class="for__group">
+                        <input name="censor_result" class="btn btn--main" type="submit" value="Deny Report Request (Delete Request)" />
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}

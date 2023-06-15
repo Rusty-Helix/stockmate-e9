@@ -1,0 +1,46 @@
+{% extends 'main.html' %}
+{% block content %}
+  <main class="create-room layout">
+    <div class="container">
+      <div class="layout__box">
+        <div class="layout__boxHeader">
+          <div class="layout__boxTitle">
+            <a href="{% url 'home' %}">
+  
+            <a href="{% url 'home' %}">
+            <i class="fa-solid fa-arrow-left"></i> 
+            </a>
+            
+            <h3>Report Post</h3>
+          </div>
+        </div>
+        <div class="layout__body">
+          <form class="form" action="" method="POST">
+          	{% csrf_token %}
+
+            <div class="form__group">
+
+              <label for="room_topic">Select the Problem of the Post "{{room.name}}"</label>
+              <hr>
+              <div>
+                {% for choice in form.reason %}
+                <div>
+                  <label for = {{ choice.choice_label }}>
+                    {{choice.choice_label}}{{ choice.tag }}
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="form__action">
+              <a class="btn btn--dark" href="{% url 'home' %}">Cancel</a>
+              <button class="btn btn--main" type="submit">Submit</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  {% endblock content %}
